@@ -1,0 +1,48 @@
+mandelbrot set:
+z_n+1 = z_n^2 + C
+
+z_n = (x + yi)
+C = constant (pixels scaled to be on the mandelbrot set's bounds, x[-2.5:1], y[-1,1] for a fully zoomed out pic)
+
+
+(z_n)^2 = (x + yi) * (x + yi)=
+x^2 + xyi + xyi + yi^2=
+x^2 + (y^2 * i^2) + 2xyi=
+x^2 - y^2 + 2xyi
+
+dont forget to add the C!
+z_(n+1) = (x^2 - y^2 + 2xyi) + C
+
+C is complex! (x coord is real part, y coord is imaginary part)
+z_(n+1) = (x^2 - y^2 + 2xyi) + (x_scaled + y_scaled * i)=
+(x^2 - y^2 + 2xyi) + x_scaled + y_scaled*i
+
+separate real and fake part (because we have to do this to plot using normal numbers anyways):
+x_n+1=(x^2 - y^2 + x_scaled)
+y_n+1=(2xyi + y_scaled * i)
+
+thus: z_(n+1) = (x^2 - y^2 + x_scaled) + (2xyi + y_scaled * i)
+
+with a complex plane, x axis is real part, y axis is imaginary. This is perfect because then we can just plot real part on x axis, and imaginary part with no more funky math on the y axis
+
+in code:
+
+float x_scaled = x coord scaled to mandel
+float y_scaled = y coord scaled to mandel
+float x = 0.0 #mandelbrot just starts from complex number 0 + 0i
+floay y = 0.0 #^
+for(as many iterations as we want){
+	if(doesnt escape from set){
+		x = (x^2 - y^2 + x_scaled)
+		y = (2xy + y_scaled)
+	}
+	else if(escaped from set){
+		return iterations it took to escape, use this to determine how to shade a pixel (how "chaotic" a certain point is)
+	}
+}
+
+##ESCAPE FROM SET: Defined as when for infinite iterations, a number is **not** bounded. For all n in f(x) = n: some real number k >= n
+does not matter what K is
+example: Z_1 = 1, Z_2 = -1, Z_3 + 1,...,z_infinity = -1
+Doesn't have to follow a calculable pattern, just has to be bounded
+#for mandelbrot, if either x or y >=2, it will escape, thus if (x >= 2 || y >= 2) escape; ##I think this is wrong actually, and it's if x + y >= 4.
