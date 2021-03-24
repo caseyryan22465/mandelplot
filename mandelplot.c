@@ -7,8 +7,8 @@
 //mandelbrot only between these values
 
 //scales a number that was previously on range [0:nMax] to [nMin:nMax], meant to convert pixels of an image to mandelbrot
-long double scalePixel(int n, int nMax, long double newMin, long double newMax){
-  long double scaled = ((((long double) n / (long double) nMax)) * (newMax-newMin)) + newMin;
+long double scalePixel(int n, int nMax,int nMin, long double newMin, long double newMax){
+  long double scaled = (((((long double) n - nMin) / (long double) (nMax-nMin))) * (newMax-newMin)) + newMin;
   return scaled;
 }
 
@@ -19,10 +19,12 @@ long double scalePixel(int n, int nMax, long double newMin, long double newMax){
 //}
 unsigned char* escapeTimeData(int width, int height, int iterations, long double xLow, long double xHigh, long double yLow, long double yHigh){
   unsigned char *data = malloc(width*height*sizeof(unsigned char));//pointer that allocates width*height bytes to store the ints as a 2d array
-  for(int i = 0; i < width; i++){
-    long double x0 = scalePixel(i, width, xLow, xHigh);
-    for(int j = 0; j < height; j++){
-      long double y0 = scalePixel(j, height, yLow, yHigh);
+  int countx = 0;
+  for(int i = (-1*(width/2)); i < width/2; i++){//mandelbrot done from (0,0)=center, image plotting done from (0,0) = top left
+    long double x0 = scalePixel(i, width/2, (-1*width/2), xLow, xHigh);
+    int county = 0;
+    for(int j = (height/2); j > (-1*(height/2)); j--){//same as above, have to convert from mandel to digital
+      long double y0 = scalePixel(j, height/2,(-1*width/2), yLow, yHigh);
       long double x = 0.0;
       long double y = 0.0;
       long double xtemp = 0.0;
@@ -35,10 +37,15 @@ unsigned char* escapeTimeData(int width, int height, int iterations, long double
 	y = ytemp;
 	iter++;
       }
-      data[i*height+j] = (unsigned char) (255-scalePixel(iter, iterations, 0, 255));//unsigned char because image pixel data is 1 byte (0-255), so using int would be 4 bytes and mess up 3/4 of the points
+      //if(countx % 100 == 0 & county % 100 ==0){
+	//printf("pixel (%i, %i) getting value %i\n", countx, county, (unsigned char) (255-scalePixel(iter, iterations, 0, 0, 255)));
+      //}
+      data[countx*height+county] = (unsigned char) (255-scalePixel(iter, iterations, 0, 0, 255));//unsigned char because image pixel data is 1 byte (0-255), so using int would be 4 bytes and mess up 3/4 of the points
+      county++;
     }
+    countx++;
   }
-  return data;
+   return data;
 }
 
 void printArr(int row, int col, int *data){
@@ -63,12 +70,12 @@ int main(int argc, char *argv[]){
   printf("width: %i, height: %i\n",width, height);
   printf("beginning now\n");
   unsigned char *dataArr2 = escapeTimeData(width, height, 80, -2.5, 1, -1, 1);
-  int dataArr[500][500];
-  for(int i = 0; i < 500; i++){
-    for(int j = 0; j < 500; j++){
-      dataArr[i][j]= (int)scalePixel(i+j,1000,0,255);
-    }
-  }
+  unsigned char dataArr[500][500];
+  //for(int i = 0; i < 500; i++){
+    //for(int j = 0; j < 500; j++){
+      //dataArr[i][j]= (unsigned char)scalePixel((i-250),499,-250,0,255);
+      //}
+    //}
   stbi_write_png("outputsample.png", width, height, 1, dataArr2, width);
   return 1;
 }
