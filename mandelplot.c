@@ -3,24 +3,23 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-
-//mandelbrot only between these values
-
-//scales a number that was previously on range [0:nMax] to [nMin:nMax], meant to convert pixels of an image to mandelbrot
+//scales a number that was previously on range [nMin:nMax] to [nMin:nMax], meant to convert pixels of an image to mandelbrot
 long double scalePixel(int n, int nMax,int nMin, long double newMin, long double newMax){
-  long double scaled = (((((long double) n - nMin) / (long double) (nMax-nMin))) * (newMax-newMin)) + newMin;
+  //long double scaled = (((((long double) n - nMin) / (long double) (nMax-nMin))) * (newMax-newMin)) + newMin;
+	long double scaled = (((long double)(n - nMin) * (newMax - newMin))/ ((long double)(nMax - nMin))) + newMin;
   return scaled;
 }
 
-//Maybe TODO?? make a BMP writer (write binary).
-//void toImage (int width, int height, char fileName){
-//  FILE * out = fopen(filename, "wb+");//set out = opened file with write binary data and create if doesnt exist
-//  out
-//}
+void scaleTest(int n, int nMax,int nMin, long double newMin, long double newMax){
+	printf("scale %i on range %i %i to range %Lf %Lf\n", n, nMin, nMax, newMin, newMax);
+	long double out = scalePixel(n, nMax, nMin, newMin, newMax);
+	printf("result: %Lf\n", out);
+}
+
 unsigned char* escapeTimeData(int width, int height, int iterations, long double xLow, long double xHigh, long double yLow, long double yHigh){
   unsigned char *data = malloc(width*height*sizeof(unsigned char));//pointer that allocates width*height bytes to store the ints as a 2d array
   int countx = 0;
-  for(int i = (-1*(width/2)); i < width/2; i++){//mandelbrot done from (0,0)=center, image plotting done from (0,0) = top left
+  /*for(int i = (-1*(width/2)); i < width/2; i++){//mandelbrot done from (0,0)=center, image plotting done from (0,0) = top left
     long double x0 = scalePixel(i, width/2, (-1*width/2), xLow, xHigh);
     int county = 0;
     for(int j = (height/2); j > (-1*(height/2)); j--){//same as above, have to convert from mandel to digital
@@ -44,19 +43,28 @@ unsigned char* escapeTimeData(int width, int height, int iterations, long double
       county++;
     }
     countx++;
-  }
+  }*/
+	for(int i = 0; i < width; i++){
+		long double x0 = scalePixel(i, width, 0, xLow, xHigh);
+		for(int j = 0; j < height; j++){
+			long double y0 = scalePixel(j, height, 0, yLow, yHigh);
+			//math part
+			long double x = 0.0;
+			long double y = 0.0;
+			long double xtemp, ytemp;
+			int iter = 0;
+			while(iter < iterations && x + y < 4){
+				xtemp = x;
+				ytemp = y;
+				x = xtemp*xtemp - ytemp*ytemp + x0;
+				y = 2*xtemp*ytemp + y0;
+				iter++;
+			}
+			data[i*height+j] = (unsigned char) (255 - scalePixel(iter, iterations, 0, 0, 255));
+		}
+	}
    return data;
 }
-
-void printArr(int row, int col, int *data){
-  for (int i = 0; i < row; i++){
-    for (int j = 0; j < col; j++){
-      printf("data[%i][%i] = %i\n",i,j,data[i*col + j]);
-    }
-  }
-  return;
-}
-
 int main(int argc, char *argv[]){
   //take plot dimensions, mandelbrot scale dimensions (default up top), iterations?
   //form of ./name $width $height -xMin $min -xMax $max -yMin $ymin -yMax $ymax
@@ -70,12 +78,6 @@ int main(int argc, char *argv[]){
   printf("width: %i, height: %i\n",width, height);
   printf("beginning now\n");
   unsigned char *dataArr2 = escapeTimeData(width, height, 80, -2.5, 1, -1, 1);
-  unsigned char dataArr[500][500];
-  //for(int i = 0; i < 500; i++){
-    //for(int j = 0; j < 500; j++){
-      //dataArr[i][j]= (unsigned char)scalePixel((i-250),499,-250,0,255);
-      //}
-    //}
-  stbi_write_png("outputsample.png", width, height, 1, dataArr2, width);
+  stbi_write_png("outputsample.png", width, height, 1, dataArr2, height);
   return 1;
 }
