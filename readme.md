@@ -4,30 +4,23 @@ Mandelplot is a small command line project that generates images of [the Mandelb
 
 ## Installation
 
-Use git and pip to install the package and dependencies
-
+Use git or wget to download the `mandelplot.c` and `stbi_image_write.h` files.
 ```bash
 git clone https://github.com/caseyryan22465/mandelplot.git
 ```
-navigate into the directory, then install the requirements
+or
 ```bash
-pip install -r requirements.txt
+wget https://raw.githubusercontent.com/caseyryan22465/mandelplot/main/mandelplot.c
+wget https://github.com/nothings/stb/raw/master/stb_image_write.h
 ```
+and compile `mandelplot.c` with the compiler of your choice
 
 ## Usage
-
-```bash
-py mandelplot.py 1920 1080
-#generates 1920x1080 image of the mandelbrot set at img/output_1920x1080.png
-
-py mandelplot.py $width $height -n $name -p $progressInterval -d $dir
-#generates width x height image and updates user every $progressInterval percent. Stores to $dir/$name
-
-py mandelplot.py -h
-#displays help
-```
+run the compiled executable with the args `width height` to generate a $WIDTHx$HEIGHT png image of the mandelbrot set. Ex: `./mandelplot 1920 1080` will output a 1920x1080 image of the mandelbrot set to the current directory, titled `output.png`
 
 ## About
-This project is mainly me trying to wrap my head around the Mandelbrot set and complex numbers a bit more. Currently the important parts of the code are from [CodinGame](https://www.codingame.com/playgrounds/2358/how-to-plot-the-mandelbrot-set/mandelbrot-set) and I just made it generate according to arguments given from the command line. However, I am porting it to C for performance and practice reasons, so this is just a starting point I can test against
+This project is mainly me trying to wrap my head around the Mandelbrot set and complex numbers a bit more.  I watched a couple of the mandelbrot zoom videos and wanted to make one myself, so this is working towards that.
+
+Image write library is from the [stb](https://github.com/nothings/stb/blob/master/stb_image_write.h) repo by [nothings](https://github.com/nothings)
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
