@@ -3,7 +3,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-//scales a number that was previously on range [nMin:nMax] to [nMin:nMax], meant to convert pixels of an image to mandelbrot
+//scales a number that was previously on range [nMin:nMax] to [newMin:newMax], meant to convert pixels of an image to mandelbrot dimensions
 long double scalePixel(int n, int nMax,int nMin, long double newMin, long double newMax){
 	long double scaled = (((long double)(n - nMin) * (newMax - newMin))/ ((long double)(nMax - nMin))) + newMin;
   return scaled;
